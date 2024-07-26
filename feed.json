@@ -10,6 +10,20 @@
     },
     "items": [
         {
+            "id": "https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html",
+            "url": "https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html",
+            "title": "关于如何下载appStore 包",
+            "summary": "libimobiledevice 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。 brew tap majd/repo brew install ipatool 登录： ipatool auth login -e &quot;邮箱&quot; -p &quot;密码&quot; 需要输入设备上提示的二次确认6位数字密码 ipatool search --limit 1 花小猪打车 购买许可： ipatool purchase --bundle-identifier com.kfhuaxiaozhu.driver 下载 ipatool download --bundle-identifier com.kfhuaxiaozhu.driver --output kfdirver.ipa",
+            "content_html": "<p><strong>libimobiledevice</strong> 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。</p><pre><code>brew tap majd/repo\nbrew install ipatool\n</code></pre>\n<p>登录：</p><pre><code>ipatool auth login -e &quot;邮箱&quot; -p &quot;密码&quot;\n</code></pre>\n<p>需要输入设备上提示的二次确认6位数字密码</p><pre><code>ipatool search --limit 1 花小猪打车\n</code></pre>\n<p>购买许可：</p><pre><code>ipatool purchase --bundle-identifier com.kfhuaxiaozhu.driver\n</code></pre>\n<p>下载</p><pre><code>ipatool download --bundle-identifier com.kfhuaxiaozhu.driver --output kfdirver.ipa\n</code></pre>\n",
+            "author": {
+                "name": "Ambrose duan"
+            },
+            "tags": [
+            ],
+            "date_published": "2024-07-26T14:37:27+08:00",
+            "date_modified": "2024-07-26T14:37:27+08:00"
+        },
+        {
             "id": "https://ambrose1.github.io/ambroses-blog.html",
             "url": "https://ambrose1.github.io/ambroses-blog.html",
             "title": "Ambrose&#x27;s blog",
