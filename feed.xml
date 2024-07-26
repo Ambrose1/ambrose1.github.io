@@ -3,10 +3,30 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>1970-01-01T08:00:00+08:00</updated>
+    <updated>2024-07-26T14:24:14+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>Ambrose&#x27;s blog</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/ambroses-blog.html"/>
+        <id>https://ambrose1.github.io/ambroses-blog.html</id>
+
+        <updated>2024-07-26T14:24:14+08:00</updated>
+            <summary>
+                <![CDATA[
+                    hi! Ambrose Dyx will be recording all learning tasks here…
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <p>hi! Ambrose Dyx will be recording all learning tasks here…</p>
+            ]]>
+        </content>
+    </entry>
 </feed>

@@ -9,5 +9,19 @@
         "name": "Ambrose duan"
     },
     "items": [
+        {
+            "id": "https://ambrose1.github.io/ambroses-blog.html",
+            "url": "https://ambrose1.github.io/ambroses-blog.html",
+            "title": "Ambrose&#x27;s blog",
+            "summary": "hi! Ambrose Dyx will be recording all learning tasks here…",
+            "content_html": "<p>hi! Ambrose Dyx will be recording all learning tasks here…</p>",
+            "author": {
+                "name": "Ambrose duan"
+            },
+            "tags": [
+            ],
+            "date_published": "2024-07-26T14:24:14+08:00",
+            "date_modified": "2024-07-26T14:24:14+08:00"
+        }
     ]
 }
