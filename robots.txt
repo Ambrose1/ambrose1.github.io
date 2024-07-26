@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://ambrose1.github.io/sitemap.xml
