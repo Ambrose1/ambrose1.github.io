@@ -5,10 +5,26 @@
     "home_page_url": "https://ambrose1.github.io",
     "feed_url": "https://ambrose1.github.io/feed.json",
     "user_comment": "",
+    "icon": "https://ambrose1.github.io/media/website/20150708214812.jpg",
     "author": {
         "name": "Ambrose duan"
     },
     "items": [
+        {
+            "id": "https://ambrose1.github.io/ruby-kai-fa-gui-fan.html",
+            "url": "https://ambrose1.github.io/ruby-kai-fa-gui-fan.html",
+            "title": "Ruby 开发规范",
+            "summary": "Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &amp;&amp;/||. 判断条件的body只有一行时，建议这样写： something() if condition 2",
+            "content_html": "<ol>\n<li>Favor modifier <code>if</code> usage when having a single-line body. Another good alternative is the usage of control flow <code>&amp;&amp;</code>/<code>||</code>.</li>\n</ol>\n<p>判断条件的body只有一行时，建议这样写：</p><pre><code class=\"language-ruby\">something() if condition\n</code></pre>\n<p>2</p>",
+            "author": {
+                "name": "Ambrose duan"
+            },
+            "tags": [
+                   "Ruby"
+            ],
+            "date_published": "2024-07-26T16:52:28+08:00",
+            "date_modified": "2024-07-26T16:52:28+08:00"
+        },
         {
             "id": "https://ambrose1.github.io/bao-ti-ji-shou-shen.html",
             "url": "https://ambrose1.github.io/bao-ti-ji-shou-shen.html",
@@ -34,9 +50,10 @@
                 "name": "Ambrose duan"
             },
             "tags": [
+                   "iOS"
             ],
             "date_published": "2024-07-26T14:37:27+08:00",
-            "date_modified": "2024-07-26T14:37:27+08:00"
+            "date_modified": "2024-07-26T16:53:40+08:00"
         },
         {
             "id": "https://ambrose1.github.io/ambroses-blog.html",

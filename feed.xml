@@ -3,12 +3,38 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-07-26T14:51:33+08:00</updated>
+    <updated>2024-07-26T16:53:40+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>Ruby 开发规范</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/ruby-kai-fa-gui-fan.html"/>
+        <id>https://ambrose1.github.io/ruby-kai-fa-gui-fan.html</id>
+            <category term="Ruby"/>
+
+        <updated>2024-07-26T16:52:28+08:00</updated>
+            <summary>
+                <![CDATA[
+                    Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &amp;&amp;/||. 判断条件的body只有一行时，建议这样写： something() if condition 2
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <ol>
+<li>Favor modifier <code>if</code> usage when having a single-line body. Another good alternative is the usage of control flow <code>&amp;&amp;</code>/<code>||</code>.</li>
+</ol>
+<p>判断条件的body只有一行时，建议这样写：</p><pre><code class="language-ruby">something() if condition
+</code></pre>
+<p>2</p>
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>iOS 包体积治理~编译配置</title>
         <author>
@@ -40,6 +66,7 @@
         </author>
         <link href="https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html"/>
         <id>https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html</id>
+            <category term="iOS"/>
 
         <updated>2024-07-26T14:37:27+08:00</updated>
             <summary>
