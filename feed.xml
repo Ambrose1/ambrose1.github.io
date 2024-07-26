@@ -3,12 +3,36 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-07-26T14:37:27+08:00</updated>
+    <updated>2024-07-26T14:51:33+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>iOS 包体积治理~编译配置</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/bao-ti-ji-shou-shen.html"/>
+        <id>https://ambrose1.github.io/bao-ti-ji-shou-shen.html</id>
+            <category term="iOS"/>
+
+        <updated>2024-07-26T14:50:11+08:00</updated>
+            <summary>
+                <![CDATA[
+                    编译配置，pod库搜不到的项都是继承壳工程的。
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <ol>
+<li>编译配置，pod库搜不到的项都是继承壳工程的。</li>
+</ol>
+
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>关于如何下载appStore 包</title>
         <author>

@@ -10,6 +10,21 @@
     },
     "items": [
         {
+            "id": "https://ambrose1.github.io/bao-ti-ji-shou-shen.html",
+            "url": "https://ambrose1.github.io/bao-ti-ji-shou-shen.html",
+            "title": "iOS 包体积治理~编译配置",
+            "summary": "编译配置，pod库搜不到的项都是继承壳工程的。",
+            "content_html": "<ol>\n<li>编译配置，pod库搜不到的项都是继承壳工程的。</li>\n</ol>\n",
+            "author": {
+                "name": "Ambrose duan"
+            },
+            "tags": [
+                   "iOS"
+            ],
+            "date_published": "2024-07-26T14:50:11+08:00",
+            "date_modified": "2024-07-26T14:51:33+08:00"
+        },
+        {
             "id": "https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html",
             "url": "https://ambrose1.github.io/guan-yu-ru-he-xia-zai-appstore-bao.html",
             "title": "关于如何下载appStore 包",
