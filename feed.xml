@@ -3,12 +3,24 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-07-29T09:49:33+08:00</updated>
+    <updated>2024-07-29T20:30:18+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>iOS包体积 无用代码监测</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/iosbao-ti-ji-wu-yong-dai-ma-jian-ce.html"/>
+        <id>https://ambrose1.github.io/iosbao-ti-ji-wu-yong-dai-ma-jian-ce.html</id>
+
+        <updated>2024-07-29T19:28:13+08:00</updated>
+            <summary></summary>
+        <content></content>
+    </entry>
     <entry>
         <title>每日信息差</title>
         <author>
@@ -87,15 +99,33 @@
         <updated>2024-07-26T14:50:11+08:00</updated>
             <summary>
                 <![CDATA[
-                    编译配置，pod库搜不到的项都是继承壳工程的。
+                    编译配置，pod库搜不到的项都是继承壳工程的。 改打包配置一般都是所以target继承自壳工程，所以一般改配置都是在壳工程修改。 一般公司的打包机器，打测试包都不会修改打包机的壳工程配置，做修改也不能直接线上集成测试，所以可以自己在本地xcode Arechive 包。 自己Archive记得清理构建文件夹。 不确定是否带上了修改后的配置，可以使用命令构建包： xcodebuild -project path/to/OpenDriver.xcodeproj -scheme OpenDriver -sdk iphoneos -archivePath path/to/OpenDriver.xcarchive -configuration Release clean build 如果你不需要考虑模拟器，而是想要直接构建并安装到真实设备上，你可以省略与模拟器相关的参数。以下是一个针对真实设备的 xcodebuild 命令示例，同时使用了&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
                 <ol>
 <li>编译配置，pod库搜不到的项都是继承壳工程的。</li>
+<li>改打包配置一般都是所以target继承自壳工程，所以一般改配置都是在壳工程修改。</li>
+<li>一般公司的打包机器，打测试包都不会修改打包机的壳工程配置，做修改也不能直接线上集成测试，所以可以自己在本地xcode Arechive 包。</li>
+<li>自己Archive记得清理构建文件夹。</li>
 </ol>
-
+<p>不确定是否带上了修改后的配置，可以使用命令构建包：</p><pre><code>xcodebuild -project path/to/OpenDriver.xcodeproj -scheme OpenDriver -sdk iphoneos -archivePath path/to/OpenDriver.xcarchive -configuration Release clean build
+</code></pre>
+<p>如果你不需要考虑模拟器，而是想要直接构建并安装到真实设备上，你可以省略与模拟器相关的参数。以下是一个针对真实设备的 <code>xcodebuild</code> 命令示例，同时使用了 <code>--repo-update</code> 参数：</p><pre><code class="language-bash">xcodebuild -project MyApp.xcodeproj -scheme MyApp -destination &#39;generic/platform=iOS&#39; -configuration Release clean build install --repo-update
+</code></pre>
+<p>在这个命令中：</p><ul>
+<li><code>-destination &#39;generic/platform=iOS&#39;</code>：指定目标平台为 iOS，不指定具体设备，这样构建出的包可以安装到任何连接的 iOS 设备上。</li>
+<li>其他参数与之前相同，包括项目文件、scheme、构建配置、清理和构建操作，以及 <code>--repo-update</code> 参数用于更新依赖。</li>
+</ul>
+<p>请注意，为了在真实设备上安装应用，你需要有一个有效的开发者账号，并且设备需要注册到你的 Apple 开发者账号下，并且处于信任状态。</p><p>在执行这个命令之前，确保你的设备已经连接到电脑，并且在 Xcode 中被识别。此外，你可能需要在设备上手动信任开发者证书。</p><p>如果你的项目使用了其他依赖管理工具，确保在执行 <code>xcodebuild</code> 命令之前，先手动更新这些依赖，或者在构建脚本中加入相应的更新步骤。</p><h3 id="xcworkspace">xcworkspace</h3>
+<p>如果你的项目使用了 CocoaPods 或其他依赖管理工具，并且这些依赖被整合到了一个 <code>.xcworkspace</code> 文件中，那么在使用 <code>xcodebuild</code> 命令时，你需要指定 <code>.xcworkspace</code> 而不是 <code>.xcodeproj</code> 文件。这是因为 <code>.xcworkspace</code> 包含了项目文件和所有依赖的配置。</p><p>例如，如果你的项目名为 <code>MyApp</code>，并且你使用了 CocoaPods，那么你应该使用以下命令：</p><pre><code class="language-bash">xcodebuild -workspace MyApp.xcworkspace -scheme MyApp -destination &#39;generic/platform=iOS&#39; -configuration Release clean build install --repo-update
+</code></pre>
+<p>在这个命令中：</p><ul>
+<li><code>-workspace MyApp.xcworkspace</code>：指定工作空间文件，而不是项目文件。这确保了所有依赖项都被正确加载。</li>
+<li>其他参数与之前相同，包括 scheme、目标平台、构建配置、清理和构建操作，以及 <code>--repo-update</code> 参数用于更新依赖。</li>
+</ul>
+<p>如果你的项目没有使用 <code>.xcworkspace</code>，或者你没有使用任何依赖管理工具，那么你可以继续使用 <code>.xcodeproj</code> 文件。</p><p>请记住，使用 <code>.xcworkspace</code> 是在项目中使用了依赖管理工具（如 CocoaPods、Carthage 等）时的常见做法，它确保了所有依赖项都被正确地集成到 Xcode 项目中。如果你的项目没有使用这些工具，那么你只需要关注 <code>.xcodeproj</code> 文件即可。</p><p>调整完编译配置，没有任何效果，未知原因待确定。</p>
             ]]>
         </content>
     </entry>
