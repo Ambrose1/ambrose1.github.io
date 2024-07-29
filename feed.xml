@@ -3,12 +3,52 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-07-26T16:53:40+08:00</updated>
+    <updated>2024-07-29T09:30:42+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>每日信息差</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/mei-ri-xin-xi-chai.html"/>
+        <id>https://ambrose1.github.io/mei-ri-xin-xi-chai.html</id>
+
+        <updated>2024-07-29T09:30:42+08:00</updated>
+            <summary></summary>
+        <content></content>
+    </entry>
+    <entry>
+        <title>软件设计师备考</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/ruan-jian-she-ji-shi-bei-kao.html"/>
+        <id>https://ambrose1.github.io/ruan-jian-she-ji-shi-bei-kao.html</id>
+
+        <updated>2024-07-29T09:30:20+08:00</updated>
+            <summary>
+                <![CDATA[
+                    考试信息 考试时间：5、11月 考试形式： 1. 上午-选择题目 2. 下午简答题。 3. 满分75-45通过。 4. 机考
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <h1 id="考试信息">考试信息</h1>
+<ul>
+<li>考试时间：5、11月</li>
+<li>考试形式：
+      1. 上午-选择题目<br>      2. 下午简答题。
+      3. 满分75-45通过。
+      4. 机考</li>
+</ul>
+
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>Ruby 开发规范</title>
         <author>
