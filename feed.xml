@@ -61,7 +61,7 @@
         <updated>2024-07-26T16:52:28+08:00</updated>
             <summary>
                 <![CDATA[
-                    Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &amp;&amp;/||. 判断条件的body只有一行时，建议这样写： something() if condition&hellip;
+                    Favor modifier if usage when having a single-line body. Another good alternative&hellip;
                 ]]>
             </summary>
         <content type="html">
@@ -111,7 +111,7 @@
         <updated>2024-07-26T14:37:27+08:00</updated>
             <summary>
                 <![CDATA[
-                    libimobiledevice 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。 brew tap majd/repo brew install ipatool 登录： ipatool auth login -e &quot;邮箱&quot; -p &quot;密码&quot; 需要输入设备上提示的二次确认6位数字密码 ipatool search --limit 1 花小猪打车 购买许可：&hellip;
+                    libimobiledevice 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。 brew tap majd/repo brew install ipatool 登录： ipatool auth login&hellip;
                 ]]>
             </summary>
         <content type="html">
