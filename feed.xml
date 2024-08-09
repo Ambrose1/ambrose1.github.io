@@ -3,7 +3,7 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-07-29T20:30:18+08:00</updated>
+    <updated>2024-08-09T09:41:38+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
@@ -31,7 +31,11 @@
 
         <updated>2024-07-29T09:30:42+08:00</updated>
             <summary></summary>
-        <content></content>
+        <content type="html">
+            <![CDATA[
+                <figure class="post__image"><img loading="lazy" src="https://ambrose1.github.io/mei-ri-xin-xi-chai.html" alt="目录测试"  data-is-external-image="true"></figure>
+            ]]>
+        </content>
     </entry>
     <entry>
         <title>软件设计师备考</title>
