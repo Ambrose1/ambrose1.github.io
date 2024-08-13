@@ -3,7 +3,7 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-08-13T10:27:01+08:00</updated>
+    <updated>2024-08-13T10:35:30+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
@@ -20,7 +20,7 @@
         <updated>2024-08-13T10:27:01+08:00</updated>
             <summary>
                 <![CDATA[
-                    xcode 编译报错Build service could not create build operation: Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: “unable to&hellip;
+                    xcode 编译报错Build service could not create build operation: Build service could not&hellip;
                 ]]>
             </summary>
         <content type="html">
@@ -99,7 +99,7 @@
         <updated>2024-07-26T16:52:28+08:00</updated>
             <summary>
                 <![CDATA[
-                    Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &amp;&amp;/||. 判断条件的body只有一行时，建议这样写： something() if condition&hellip;
+                    Favor modifier if usage when having a single-line body. Another good alternative&hellip;
                 ]]>
             </summary>
         <content type="html">
@@ -125,7 +125,7 @@
         <updated>2024-07-26T14:50:11+08:00</updated>
             <summary>
                 <![CDATA[
-                    编译配置，pod库搜不到的项都是继承壳工程的。 改打包配置一般都是所以target继承自壳工程，所以一般改配置都是在壳工程修改。 一般公司的打包机器，打测试包都不会修改打包机的壳工程配置，做修改也不能直接线上集成测试，所以可以自己在本地xcode Arechive 包。 自己Archive记得清理构建文件夹。 不确定是否带上了修改后的配置，可以使用命令构建包： xcodebuild -project path/to/OpenDriver.xcodeproj -scheme OpenDriver -sdk iphoneos -archivePath path/to/OpenDriver.xcarchive -configuration Release clean build 如果你不需要考虑模拟器，而是想要直接构建并安装到真实设备上，你可以省略与模拟器相关的参数。以下是一个针对真实设备的 xcodebuild 命令示例，同时使用了&hellip;
+                    编译配置，pod库搜不到的项都是继承壳工程的。 改打包配置一般都是所以target继承自壳工程，所以一般改配置都是在壳工程修改。 一般公司的打包机器，打测试包都不会修改打包机的壳工程配置，做修改也不能直接线上集成测试，所以可以自己在本地xcode Arechive 包。 自己Archive记得清理构建文件夹。 不确定是否带上了修改后的配置，可以使用命令构建包： xcodebuild -project path/to/OpenDriver.xcodeproj -scheme OpenDriver&hellip;
                 ]]>
             </summary>
         <content type="html">
@@ -167,7 +167,7 @@
         <updated>2024-07-26T14:37:27+08:00</updated>
             <summary>
                 <![CDATA[
-                    libimobiledevice 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。 brew tap majd/repo brew install ipatool 登录： ipatool auth login -e &quot;邮箱&quot; -p &quot;密码&quot; 需要输入设备上提示的二次确认6位数字密码 ipatool search --limit 1 花小猪打车 购买许可：&hellip;
+                    libimobiledevice 不越狱操作iphone安装包，查看设备信息，安装包信息，备份。 brew tap majd/repo brew install ipatool 登录： ipatool auth login&hellip;
                 ]]>
             </summary>
         <content type="html">
