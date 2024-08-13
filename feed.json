@@ -10,6 +10,20 @@
     },
     "items": [
         {
+            "id": "https://ambrose1.github.io/ios-bao-cuo-chu-li.html",
+            "url": "https://ambrose1.github.io/ios-bao-cuo-chu-li.html",
+            "title": "iOS 报错处理",
+            "summary": "xcode 编译报错Build service could not create build operation: Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: “unable to&hellip;",
+            "content_html": "<h1 id=\"xcode-编译报错build-service-could-not-create-build-operation\">xcode 编译报错Build service could not create build operation:</h1>\n<p>Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: “unable to initiate PIF transfer session (operation in progress?)”)\n解决方案：重启xcode</p>",
+            "author": {
+                "name": "Ambrose duan"
+            },
+            "tags": [
+            ],
+            "date_published": "2024-08-13T10:27:01+08:00",
+            "date_modified": "2024-08-13T10:27:01+08:00"
+        },
+        {
             "id": "https://ambrose1.github.io/iosbao-ti-ji-wu-yong-dai-ma-jian-ce.html",
             "url": "https://ambrose1.github.io/iosbao-ti-ji-wu-yong-dai-ma-jian-ce.html",
             "title": "iOS包体积 无用代码监测",

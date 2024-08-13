@@ -3,12 +3,34 @@
     <title>Ambrose&#x27;s Blog</title>
     <link href="https://ambrose1.github.io/feed.xml" rel="self" />
     <link href="https://ambrose1.github.io" />
-    <updated>2024-08-09T09:41:38+08:00</updated>
+    <updated>2024-08-13T10:27:01+08:00</updated>
     <author>
         <name>Ambrose duan</name>
     </author>
     <id>https://ambrose1.github.io</id>
 
+    <entry>
+        <title>iOS 报错处理</title>
+        <author>
+            <name>Ambrose duan</name>
+        </author>
+        <link href="https://ambrose1.github.io/ios-bao-cuo-chu-li.html"/>
+        <id>https://ambrose1.github.io/ios-bao-cuo-chu-li.html</id>
+
+        <updated>2024-08-13T10:27:01+08:00</updated>
+            <summary>
+                <![CDATA[
+                    xcode 编译报错Build service could not create build operation: Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: “unable to&hellip;
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <h1 id="xcode-编译报错build-service-could-not-create-build-operation">xcode 编译报错Build service could not create build operation:</h1>
+<p>Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: “unable to initiate PIF transfer session (operation in progress?)”)
+解决方案：重启xcode</p>
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>iOS包体积 无用代码监测</title>
         <author>
