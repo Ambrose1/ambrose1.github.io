@@ -5,8 +5,9 @@ header-img: img/home-bg.jpg
 email: Ambrosedy@163.com
 description: ""
 keyword: ""
-url: ""              # your host, for absolute URL
-baseurl: "/"         # for example, '/blog' if your blog hosted on 'host/blog'
+url: "http://ambrose1.github.io"          # your host, for absolute URL
+baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
+github_repo: "https://github.com/ambrose1/ambrose1.github.io.git" # you code repository
 
 
 
