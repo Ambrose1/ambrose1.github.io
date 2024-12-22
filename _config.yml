@@ -6,14 +6,14 @@
 title: DYX 的博客
 subtitle: '赚钱、生活、摄影、旅行'
 description: ''
-keywords:
+keywords: '记录'
 author: Ambrose
 language: en
 timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: http://ambrose1.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
