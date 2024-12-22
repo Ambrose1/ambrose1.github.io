@@ -1,3 +1,6 @@
 [submodule "themes/hexo-theme-last"]
 	path = themes/hexo-theme-last
 	url = git@github.com:DyingDown/hexo-theme-last.git
+[submodule "themes/archer"]
+	path = themes/archer
+	url = git@github.com:fi3ework/hexo-theme-archer.git
