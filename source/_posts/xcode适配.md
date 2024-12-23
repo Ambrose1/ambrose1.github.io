@@ -1,7 +1,11 @@
 ---
 title: xcode适配
 date: 2024-12-23 10:40:19
-tags: iOS XCode
+tags: 
+- iOS 
+- XCode
+categories:
+- iOS
 donate: true
 ---
 
