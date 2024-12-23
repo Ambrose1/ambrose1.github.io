@@ -2,7 +2,7 @@
 title: xcode适配
 date: 2024-12-23 10:40:19
 tags: iOS
-donate: true # 在当前文章隐藏打赏按钮
+donate: true
 ---
 
 # Xcode 16
@@ -25,7 +25,7 @@ be imported from module 'Darwin.POSIX.sys.types._sa_family_t' before it is requi
 
 ## xcode 16.1 beta 中 __mh_execute_header 编译报错
 
-![](./images/xcode-adapter-image.png)
+![](/Users/didi/learn/blog/ambBlog/assets/post-images/xcode-adapter-image.png)
 
 ## 汇编语言报错
 
