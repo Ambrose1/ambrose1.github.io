@@ -1,10 +1,9 @@
 ---
 title: xcode适配
 date: 2024-12-23 10:40:19
-tags:
+tags: iOS
+donate: true # 在当前文章隐藏打赏按钮
 ---
-
-
 
 # Xcode 16
 
@@ -13,8 +12,6 @@ tags:
 be imported from module 'Darwin.POSIX.sys.types._sa_family_t' before it is required
 
 **解决方案：** 手动导入 #import <sys/_types/_sa_family_t.h>
-
-
 
 ## unsupported option '-G' for target 'arm64-apple-ios12.0'
 
@@ -35,7 +32,5 @@ be imported from module 'Darwin.POSIX.sys.types._sa_family_t' before it is requi
 修改对应汇编报错部分代码。
 
 [案例待补充]
-
-
 
 持续更新ing
