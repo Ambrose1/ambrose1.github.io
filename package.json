@@ -29,6 +29,5 @@
     "hexo-generator-archive": "^2.0.0",
     "hexo-wordcount": "^6.0.1",
     "hexo-filter-mermaid-diagrams": "^1.0.5",
-    "hexo-renderer-pandoc": "^0.4.0"
   }
 }
