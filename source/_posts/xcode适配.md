@@ -25,7 +25,7 @@ be imported from module 'Darwin.POSIX.sys.types._sa_family_t' before it is requi
 
 ## xcode 16.1 beta 中 __mh_execute_header 编译报错
 
-![](/assets/post-images/xcode-adapter-image.png)
+![xcode adapter image](https://s1.imagehub.cc/images/2024/12/23/3d833cc9aaf19cedc024ffb879f6ebd7.png)
 
 ## 汇编语言报错
 
