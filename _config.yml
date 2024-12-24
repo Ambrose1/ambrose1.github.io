@@ -191,7 +191,7 @@ comment:
     username:
   waline:
     enable: false
-    url: 
+    url:
     reaction: false
     emoji: []
 
@@ -246,3 +246,4 @@ visitor:
 chinese_blog:
   enable: true
   url: https://github.com/Ambrose1/ambrose1.github.io
+
