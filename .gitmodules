@@ -5,3 +5,7 @@
 	path = themes/archer
 	url = git@github.com:Ambrose1/themes.git
         branch = master
+[submodule "themes/snail"]
+	path = themes/snail
+	url = git@github.com:Ambrose1/hexo-theme-snail.git
+        branch = master
