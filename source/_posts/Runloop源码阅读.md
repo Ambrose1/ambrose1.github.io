@@ -17,9 +17,272 @@ donate: true
 
 
 
-## 一. 概述
+## 一. Runloop启动
+
+在iOS 应用中：
+
+```c
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, 
+               NSStringFromClass([AppDelegate class]));
+    }
+}
+```
+
+在macOS应用中：
+
+```c
+int main(int argc, const char * argv[]) {
+    return NSApplicationMain(argc, argv);
+}
+```
+
+这些函数内部会：
+
+- 创建主线程的 RunLoop
+
+- 设置必要的 Source/Timer/Observer
+
+- 启动 RunLoop
+
+在 UIKit/AppKit 框架中，UIApplicationMain/NSApplicationMain 会调用到 CoreFoundation 的 RunLoop 相关函数，建立整个事件循环系统。
 
 
+
+**runloop 启动方法：**
+
+```c
+// 运行当前线程的 RunLoop
+void CFRunLoopRun(void) {    /* DOES CALLOUT 表示这个函数会调用外部代码 */
+    int32_t result;
+    do {
+        // 在默认模式下运行 RunLoop
+        result = CFRunLoopRunSpecific(
+            CFRunLoopGetCurrent(),      // 获取当前线程的 RunLoop
+            kCFRunLoopDefaultMode,      // 在默认模式下运行
+            1.0e10,                     // 超时时间（接近无限）115.7天
+            false                       // returnAfterSourceHandled: 处理完事件后是否立即返回
+        );
+        
+        CHECK_FOR_FORK();    // 检查是否发生了 fork
+        
+    } while (kCFRunLoopRunStopped != result &&    // 循环未被手动停止
+             kCFRunLoopRunFinished != result);    // 循环未自然结束
+}
+```
+
+```c
+SInt32 CFRunLoopRunSpecific(
+    CFRunLoopRef rl,                    // 要运行的 RunLoop
+    CFStringRef modeName,               // 运行模式名称
+    CFTimeInterval seconds,             // 超时时间
+    Boolean returnAfterSourceHandled    // 是否在处理完事件后返回
+) {
+    CHECK_FOR_FORK();  // 检查 fork 状态
+    
+    // 如果 RunLoop 正在被释放，直接返回完成状态
+    if (__CFRunLoopIsDeallocating(rl)) return kCFRunLoopRunFinished;
+    
+    // 加锁
+    __CFRunLoopLock(rl);
+    
+    // 查找指定的运行模式
+    CFRunLoopModeRef currentMode = __CFRunLoopFindMode(rl, modeName, false);
+    
+    // 如果模式不存在或为空，则返回
+    if (NULL == currentMode || __CFRunLoopModeIsEmpty(rl, currentMode, rl->_currentMode)) {
+        Boolean did = false;
+        if (currentMode) __CFRunLoopModeUnlock(currentMode);
+        __CFRunLoopUnlock(rl);
+        return did ? kCFRunLoopRunHandledSource : kCFRunLoopRunFinished;
+    }
+    
+    // 保存当前运行状态
+    volatile _per_run_data *previousPerRun = __CFRunLoopPushPerRunData(rl);
+    CFRunLoopModeRef previousMode = rl->_currentMode;
+    rl->_currentMode = currentMode;
+    int32_t result = kCFRunLoopRunFinished;
+
+    // 1. 通知进入模式观察者
+    if (currentMode->_observerMask & kCFRunLoopEntry) 
+        __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopEntry);
+    
+    // 2. 运行主循环
+    result = __CFRunLoopRun(rl, currentMode, seconds, 
+                           returnAfterSourceHandled, previousMode);
+    
+    // 3. 通知退出模式观察者
+    if (currentMode->_observerMask & kCFRunLoopExit) 
+        __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopExit);
+
+    // 清理和恢复状态
+    __CFRunLoopModeUnlock(currentMode);
+    __CFRunLoopPopPerRunData(rl, previousPerRun);
+    rl->_currentMode = previousMode;
+    __CFRunLoopUnlock(rl);
+    
+    return result;
+}
+```
+
+这是 RunLoop 的核心实现函数，让我分段解释这个复杂的函数：
+
+### 1. 初始化和准备阶段
+
+```c:CFRunLoop.c
+static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, 
+                             CFTimeInterval seconds, Boolean stopAfterHandle, 
+                             CFRunLoopModeRef previousMode) {
+    // 记录开始时间
+    uint64_t startTSR = mach_absolute_time();
+
+    // 检查是否已停止
+    if (__CFRunLoopIsStopped(rl)) {
+        __CFRunLoopUnsetStopped(rl);
+        return kCFRunLoopRunStopped;
+    }
+
+    // 设置 dispatch 端口（主队列相关）
+    mach_port_name_t dispatchPort = MACH_PORT_NULL;
+    Boolean libdispatchQSafe = pthread_main_np() && /*...*/;
+    if (libdispatchQSafe /*...*/) 
+        dispatchPort = _dispatch_get_main_queue_port_4CF();
+```
+
+### 2. 超时处理设置
+
+```c
+    // 创建定时器处理超时
+    dispatch_source_t timeout_timer = NULL;
+    struct __timeout_context *timeout_context = malloc(sizeof(*timeout_context));
+
+    if (seconds <= 0.0) {
+        // 立即超时
+        seconds = 0.0;
+        timeout_context->termTSR = 0ULL;
+    } else if (seconds <= TIMER_INTERVAL_LIMIT) {
+        // 创建 GCD 定时器
+        timeout_timer = dispatch_source_create(/*...*/);
+        // 设置超时处理
+    } else {
+        // 无限超时
+        seconds = 9999999999.0;
+        timeout_context->termTSR = UINT64_MAX;
+    }
+```
+
+### 3. 主循环
+
+```c
+    do {
+        // 1. 通知观察者：即将处理 Timers
+        if (rlm->_observerMask & kCFRunLoopBeforeTimers) 
+            __CFRunLoopDoObservers(rl, rlm, kCFRunLoopBeforeTimers);
+
+        // 2. 通知观察者：即将处理 Sources
+        if (rlm->_observerMask & kCFRunLoopBeforeSources) 
+            __CFRunLoopDoObservers(rl, rlm, kCFRunLoopBeforeSources);
+
+        // 3. 处理 Blocks
+        __CFRunLoopDoBlocks(rl, rlm);
+
+        // 4. 处理 Source0 (非端口源)
+        Boolean sourceHandledThisLoop = __CFRunLoopDoSources0(rl, rlm, stopAfterHandle);
+
+        // 5. 处理 Blocks
+        if (sourceHandledThisLoop) {
+            __CFRunLoopDoBlocks(rl, rlm);
+        }
+```
+
+### 4. 等待和处理消息
+
+```c
+        // 通知观察者：即将进入休眠
+        if (!poll && (rlm->_observerMask & kCFRunLoopBeforeWaiting)) 
+            __CFRunLoopDoObservers(rl, rlm, kCFRunLoopBeforeWaiting);
+
+        // 设置休眠状态
+        __CFRunLoopSetSleeping(rl);
+
+        // 等待消息
+        __CFRunLoopServiceMachPort(waitSet, &msg, sizeof(msg_buffer), 
+                                  &livePort, poll ? 0 : TIMEOUT_INFINITY, 
+                                  &voucherState, &voucherCopy);
+
+        // 唤醒后处理
+        __CFRunLoopUnsetSleeping(rl);
+
+        // 通知观察者：结束休眠
+        if (!poll && (rlm->_observerMask & kCFRunLoopAfterWaiting))
+            __CFRunLoopDoObservers(rl, rlm, kCFRunLoopAfterWaiting);
+```
+
+### 5. 处理收到的消息
+
+```c
+        if (MACH_PORT_NULL == livePort) {
+            // 没有消息
+        } else if (livePort == rl->_wakeUpPort) {
+            // 被其他线程唤醒
+        } else if (livePort == dispatchPort) {
+            // 处理 dispatch
+            __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__(msg);
+        } else {
+            // 处理 Source1 (基于端口)
+            CFRunLoopSourceRef rls = __CFRunLoopModeFindSourceForMachPort(/*...*/);
+            if (rls) {
+                sourceHandledThisLoop = __CFRunLoopDoSource1(/*...*/);
+            }
+        }
+```
+
+### 6. 退出检查
+
+```c
+        // 检查是否应该退出循环
+        if (sourceHandledThisLoop && stopAfterHandle) {
+            retVal = kCFRunLoopRunHandledSource;
+        } else if (timeout_context->termTSR < mach_absolute_time()) {
+            retVal = kCFRunLoopRunTimedOut;
+        } else if (__CFRunLoopIsStopped(rl)) {
+            retVal = kCFRunLoopRunStopped;
+        } else if (__CFRunLoopModeIsEmpty(rl, rlm, previousMode)) {
+            retVal = kCFRunLoopRunFinished;
+        }
+    } while (0 == retVal);
+```
+
+### 主要功能：
+
+1. **事件源处理**
+   
+   - Source0（手动触发）
+   - Source1（基于端口）
+   - Timers
+   - Blocks
+
+2. **观察者通知**
+   
+   - 进入循环
+   - 处理定时器前
+   - 处理源前
+   - 休眠前后
+
+3. **消息循环**
+   
+   - 等待消息
+   - 处理消息
+   - 超时处理
+
+4. **状态管理**
+   
+   - 运行状态
+   - 休眠状态
+   - 退出条件
+
+这是 RunLoop 的核心实现，处理了所有事件源和状态转换，是整个事件驱动系统的基础。
 
 ## 二. 对外暴露api方法
 
@@ -934,3 +1197,61 @@ static Boolean __CFRunLoopDoBlocks(CFRunLoopRef rl, CFRunLoopModeRef rlm) {
 12.24 更新至1664行
 
 未完待续......
+
+
+
+
+
+# 思考 & 答案
+
+### 关于闲等是怎么实现的？
+
+在 RunLoop 中，闲等主要体现在以下几个关键点：
+
+```c:CFRunLoop.c
+// 1. 使用 mach_msg 等待消息，这是一个系统调用，会让线程进入休眠状态
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+    __CFRunLoopServiceMachPort(waitSet, &msg, sizeof(msg_buffer), 
+        &livePort,
+        poll ? 0 : TIMEOUT_INFINITY,  // 关键参数：TIMEOUT_INFINITY 表示无限等待
+        &voucherState, 
+        &voucherCopy
+    );
+#endif
+
+// 2. 进入休眠前的标记
+if (!poll && (rlm->_observerMask & kCFRunLoopBeforeWaiting)) 
+    __CFRunLoopDoObservers(rl, rlm, kCFRunLoopBeforeWaiting);
+__CFRunLoopSetSleeping(rl);  // 设置休眠状态
+
+// 3. poll 变量控制是否需要立即返回
+Boolean poll = sourceHandledThisLoop || (0ULL == timeout_context->termTSR);
+// poll 为 false 时表示需要等待，为 true 时表示立即返回
+```
+
+关键区别：
+
+1. **忙等实现**
+   
+   ```c
+   // 忙等会持续占用 CPU
+   while (!condition) {
+    // 不断检查，消耗 CPU
+   }
+   ```
+
+2. **闲等实现（RunLoop 采用）**
+   
+   ```c
+   // 通过系统调用让出 CPU
+   mach_msg(... TIMEOUT_INFINITY ...);  // 线程休眠直到有消息到达
+   ```
+
+闲等的优势：
+
+1. 不消耗 CPU 资源
+2. 线程会真正进入休眠状态
+3. 由系统中断或消息唤醒
+4. 更节能高效
+
+这就是为什么 RunLoop 能够高效管理线程的原因，它在没有工作时不会消耗 CPU 资源。
