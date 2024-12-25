@@ -4,6 +4,8 @@ date: 2024-12-23 10:40:19
 donate: true
 categories:
  - iOS
+tags:
+ - xcode
 ---
 
 # Xcode 16
