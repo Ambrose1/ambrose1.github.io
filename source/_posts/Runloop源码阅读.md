@@ -1,21 +1,14 @@
 ---
 title: Runloop源码阅读
 date: 2024-12-24 10:24:33
-tags: 
-- runloop
-- iOS
 categories:
-- iOS
-- C
-- Runloop
+ - iOS
 donate: true
 ---
 
 # Runloop 源码阅读笔记
 
 > runloop部分代码属于苹果开源部分，本次阅读代码来源 CF-CF-1153.18 2
-
-
 
 ## 一. Runloop启动
 
@@ -48,8 +41,6 @@ int main(int argc, const char * argv[]) {
 
 在 UIKit/AppKit 框架中，UIApplicationMain/NSApplicationMain 会调用到 CoreFoundation 的 RunLoop 相关函数，建立整个事件循环系统。
 
-
-
 **runloop 启动方法：**
 
 ```c
@@ -64,9 +55,9 @@ void CFRunLoopRun(void) {    /* DOES CALLOUT 表示这个函数会调用外部�
             1.0e10,                     // 超时时间（接近无限）115.7天
             false                       // returnAfterSourceHandled: 处理完事件后是否立即返回
         );
-        
+
         CHECK_FOR_FORK();    // 检查是否发生了 fork
-        
+
     } while (kCFRunLoopRunStopped != result &&    // 循环未被手动停止
              kCFRunLoopRunFinished != result);    // 循环未自然结束
 }
@@ -80,16 +71,16 @@ SInt32 CFRunLoopRunSpecific(
     Boolean returnAfterSourceHandled    // 是否在处理完事件后返回
 ) {
     CHECK_FOR_FORK();  // 检查 fork 状态
-    
+
     // 如果 RunLoop 正在被释放，直接返回完成状态
     if (__CFRunLoopIsDeallocating(rl)) return kCFRunLoopRunFinished;
-    
+
     // 加锁
     __CFRunLoopLock(rl);
-    
+
     // 查找指定的运行模式
     CFRunLoopModeRef currentMode = __CFRunLoopFindMode(rl, modeName, false);
-    
+
     // 如果模式不存在或为空，则返回
     if (NULL == currentMode || __CFRunLoopModeIsEmpty(rl, currentMode, rl->_currentMode)) {
         Boolean did = false;
@@ -97,7 +88,7 @@ SInt32 CFRunLoopRunSpecific(
         __CFRunLoopUnlock(rl);
         return did ? kCFRunLoopRunHandledSource : kCFRunLoopRunFinished;
     }
-    
+
     // 保存当前运行状态
     volatile _per_run_data *previousPerRun = __CFRunLoopPushPerRunData(rl);
     CFRunLoopModeRef previousMode = rl->_currentMode;
@@ -107,11 +98,11 @@ SInt32 CFRunLoopRunSpecific(
     // 1. 通知进入模式观察者
     if (currentMode->_observerMask & kCFRunLoopEntry) 
         __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopEntry);
-    
+
     // 2. 运行主循环
     result = __CFRunLoopRun(rl, currentMode, seconds, 
                            returnAfterSourceHandled, previousMode);
-    
+
     // 3. 通知退出模式观察者
     if (currentMode->_observerMask & kCFRunLoopExit) 
         __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopExit);
@@ -121,7 +112,7 @@ SInt32 CFRunLoopRunSpecific(
     __CFRunLoopPopPerRunData(rl, previousPerRun);
     rl->_currentMode = previousMode;
     __CFRunLoopUnlock(rl);
-    
+
     return result;
 }
 ```
@@ -295,7 +286,6 @@ static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm,
 3. 对外暴露结构体指针（Runloop对象、Source结构体、Observer结构体、Timer结构体） 其中Timer 显示桥接到NSTimer(CF_BRIDGED_MUTABLE_TYPE)。
 
 ```c
-
 #define CF_IMPLICIT_BRIDGING_ENABLED _Pragma("clang arc_cf_code_audited begin")
 #define CF_EXTERN_C_BEGIN extern "C" {
 
@@ -654,8 +644,6 @@ CF_EXPORT CFTimeInterval CFRunLoopTimerGetTolerance(CFRunLoopTimerRef timer) CF_
 CF_EXPORT void CFRunLoopTimerSetTolerance(CFRunLoopTimerRef timer, CFTimeInterval tolerance) CF_AVAILABLE(10_9, 7_0);
 ```
 
-
-
 ## 三. 内部实现
 
 ```c
@@ -667,7 +655,7 @@ CF_PRIVATE uint32_t __CFGetProcessPortCount(void) {
     mach_msg_type_number_t tableCount = 0;  // 端口表计数
     ipc_info_tree_name_array_t tree = 0;    // 端口树数组
     mach_msg_type_number_t treeCount = 0;   // 端口树计数
-    
+
     // 获取当前任务的端口空间信息
     kern_return_t ret = mach_port_space_info(
         mach_task_self(),  // 当前任务
@@ -677,12 +665,12 @@ CF_PRIVATE uint32_t __CFGetProcessPortCount(void) {
         &tree,            // 端口树
         &treeCount        // 树节点数量
     );
-    
+
     // 如果获取失败，返回0
     if (ret != KERN_SUCCESS) {
         return (uint32_t)0;
     }
-    
+
     // 清理分配的内存
     if (table != NULL) {
         // 释放端口表内存
@@ -692,7 +680,7 @@ CF_PRIVATE uint32_t __CFGetProcessPortCount(void) {
         // 释放端口树内存
         ret = vm_deallocate(mach_task_self(), (vm_address_t)tree, treeCount * sizeof(*tree));
     }
-    
+
     // 返回端口数量
     return (uint32_t)tableCount;
 }
@@ -703,12 +691,12 @@ CF_PRIVATE uint32_t __CFGetProcessPortCount(void) {
 CF_PRIVATE CFArrayRef __CFStopAllThreads(void) {
     // 创建一个可变数组用于存储被挂起的线程
     CFMutableArrayRef suspended_list = CFArrayCreateMutable(kCFAllocatorSystemDefault, 0, NULL);
-    
+
     // 获取当前任务（进程）的端口
     mach_port_t my_task = mach_task_self();
     // 获取当前线程的端口
     mach_port_t my_thread = mach_thread_self();
-    
+
     // 用于存储线程列表的变量
     thread_act_array_t thr_list = 0;     // 线程数组
     mach_msg_type_number_t thr_cnt = 0;  // 线程数量
@@ -716,20 +704,20 @@ CF_PRIVATE CFArrayRef __CFStopAllThreads(void) {
     // 获取当前任务中的所有线程
     // 注释提示：实际上应该循环执行停止操作，直到连续N次都没有新线程加入列表
     kern_return_t ret = task_threads(my_task, &thr_list, &thr_cnt);
-    
+
     if (ret == KERN_SUCCESS) {
         // 遍历所有线程
         for (CFIndex idx = 0; idx < thr_cnt; idx++) {
             thread_act_t thread = thr_list[idx];
-            
+
             // 跳过当前线程（不能挂起自己）
             if (thread == my_thread) continue;
-            
+
             // 如果线程已经在挂起列表中，跳过
             if (CFArrayContainsValue(suspended_list, 
                 CFRangeMake(0, CFArrayGetCount(suspended_list)), 
                 (const void *)(uintptr_t)thread)) continue;
-            
+
             // 尝试挂起线程
             ret = thread_suspend(thread);
             if (ret == KERN_SUCCESS) {
@@ -740,20 +728,18 @@ CF_PRIVATE CFArrayRef __CFStopAllThreads(void) {
                 mach_port_deallocate(my_task, thread);
             }
         }
-        
+
         // 释放线程列表占用的内存
         vm_deallocate(my_task, (vm_address_t)thr_list, sizeof(thread_t) * thr_cnt);
     }
-    
+
     // 释放当前线程的端口
     mach_port_deallocate(my_task, my_thread);
-    
+
     // 返回被挂起的线程列表
     return suspended_list;
 }
 ```
-
-
 
 在 Mach 内核中，任务（Task）和线程（Thread）是两个不同层次的概念：
 
@@ -771,36 +757,34 @@ Task (进程)
       |-- 端口权限
       |-- 其他系统资源
 
-
-
 ### 3.1 RunloopMode
 
 ```c
 struct __CFRunLoopMode {
     // 基础运行时信息
     CFRuntimeBase _base;                    // Core Foundation 对象的基础结构
-    
+
     // 同步控制
     pthread_mutex_t _lock;                  // 模式的互斥锁
-    
+
     // 基本信息
     CFStringRef _name;                      // 模式名称（如 kCFRunLoopDefaultMode）
     Boolean _stopped;                       // 模式是否已停止
     char _padding[3];                       // 字节对齐的填充
-    
+
     // 事件源管理
     CFMutableSetRef _sources0;              // 非基于端口的源（如手动触发）
     CFMutableSetRef _sources1;              // 基于端口的源（如系统事件）
     CFMutableArrayRef _observers;           // RunLoop 观察者列表
     CFMutableArrayRef _timers;             // 定时器列表
-    
+
     // 端口管理
     CFMutableDictionaryRef _portToV1SourceMap;  // 端口到源的映射
     __CFPortSet _portSet;                       // 当前模式的端口集合
-    
+
     // 观察者掩码
     CFIndex _observerMask;                      // 观察者事件掩码
-    
+
     // GCD定时器支持
 #if USE_DISPATCH_SOURCE_FOR_TIMERS
     dispatch_source_t _timerSource;        // GCD定时器源
@@ -808,19 +792,19 @@ struct __CFRunLoopMode {
     Boolean _timerFired;                   // 定时器是否已触发
     Boolean _dispatchTimerArmed;           // GCD定时器是否已装备
 #endif
-    
+
     // MK定时器支持
 #if USE_MK_TIMER_TOO
     mach_port_t _timerPort;               // MK定时器端口
     Boolean _mkTimerArmed;                // MK定时器是否已装备
 #endif
-    
+
     // Windows特定支持
 #if DEPLOYMENT_TARGET_WINDOWS
     DWORD _msgQMask;                      // 消息队列掩码
     void (*_msgPump)(void);               // 消息泵函数指针
 #endif
-    
+
     // 定时器截止时间
     uint64_t _timerSoftDeadline;          // 软截止时间
     uint64_t _timerHardDeadline;          // 硬截止时间
@@ -851,28 +835,28 @@ struct __CFRunLoop {
     pthread_mutex_t _lock;          // 访问模式列表的互斥锁
     __CFPort _wakeUpPort;          // 用于唤醒RunLoop的端口
     Boolean _unused;                // 未使用的布尔值
-    
+
     // 每次运行的状态数据
     volatile _per_run_data *_perRunData;  // 运行时数据，每次运行都会重置
-    
+
     // 线程相关
     pthread_t _pthread;             // RunLoop所属的pthread
     uint32_t _winthread;           // Windows线程ID（仅Windows平台）
-    
+
     // 模式管理
     CFMutableSetRef _commonModes;    // 通用模式名称集合
     CFMutableSetRef _commonModeItems; // 通用模式项目集合
     CFRunLoopModeRef _currentMode;   // 当前运行的模式
     CFMutableSetRef _modes;          // 所有模式的集合
-    
+
     // Block管理
     struct _block_item *_blocks_head; // Block链表头
     struct _block_item *_blocks_tail; // Block链表尾
-    
+
     // 时间统计
     CFAbsoluteTime _runTime;         // 运行时间
     CFAbsoluteTime _sleepTime;       // 睡眠时间
-    
+
     CFTypeRef _counterpart;          // 相关联的对象引用
 };
 ```
@@ -899,14 +883,13 @@ struct __CFRunLoopSource {
     CFRuntimeBase _base;
     uint32_t _bits;
     pthread_mutex_t _lock;
-    CFIndex _order;			/* immutable */
+    CFIndex _order;            /* immutable */
     CFMutableBagRef _runLoops;
     union {
-	CFRunLoopSourceContext version0;	/* immutable, except invalidation */
-        CFRunLoopSourceContext1 version1;	/* immutable, except invalidation */
+    CFRunLoopSourceContext version0;    /* immutable, except invalidation */
+        CFRunLoopSourceContext1 version1;    /* immutable, except invalidation */
     } _context;
 };
-
 ```
 
 ### 3.4 Observers
@@ -917,10 +900,10 @@ struct __CFRunLoopObserver {
     pthread_mutex_t _lock;
     CFRunLoopRef _runLoop;
     CFIndex _rlCount;
-    CFOptionFlags _activities;		/* immutable */
-    CFIndex _order;			/* immutable */
-    CFRunLoopObserverCallBack _callout;	/* immutable */
-    CFRunLoopObserverContext _context;	/* immutable, except invalidation */
+    CFOptionFlags _activities;        /* immutable */
+    CFIndex _order;            /* immutable */
+    CFRunLoopObserverCallBack _callout;    /* immutable */
+    CFRunLoopObserverContext _context;    /* immutable, except invalidation */
 };
 ```
 
@@ -934,12 +917,12 @@ struct __CFRunLoopTimer {
     CFRunLoopRef _runLoop;
     CFMutableSetRef _rlModes;
     CFAbsoluteTime _nextFireDate;
-    CFTimeInterval _interval;		/* immutable */
+    CFTimeInterval _interval;        /* immutable */
     CFTimeInterval _tolerance;          /* mutable */
-    uint64_t _fireTSR;			/* TSR units */
-    CFIndex _order;			/* immutable */
-    CFRunLoopTimerCallBack _callout;	/* immutable */
-    CFRunLoopTimerContext _context;	/* immutable, except invalidation */
+    uint64_t _fireTSR;            /* TSR units */
+    CFIndex _order;            /* immutable */
+    CFRunLoopTimerCallBack _callout;    /* immutable */
+    CFRunLoopTimerContext _context;    /* immutable, except invalidation */
 };
 ```
 
@@ -964,10 +947,10 @@ struct __CFRunLoopTimer {
 static CFRunLoopRef __CFRunLoopCreate(pthread_t t) {
     CFRunLoopRef loop = NULL;
     CFRunLoopModeRef rlm;
-    
+
     // 计算需要分配的内存大小（减去基础结构体大小）
     uint32_t size = sizeof(struct __CFRunLoop) - sizeof(CFRuntimeBase);
-    
+
     // 创建 RunLoop 实例
     loop = (CFRunLoopRef)_CFRuntimeCreateInstance(
         kCFAllocatorSystemDefault,    // 使用默认内存分配器
@@ -975,25 +958,25 @@ static CFRunLoopRef __CFRunLoopCreate(pthread_t t) {
         size,                         // 分配大小
         NULL                          // 无额外配置
     );
-    
+
     // 创建失败则返回 NULL
     if (NULL == loop) {
         return NULL;
     }
-    
+
     // 初始化每次运行数据
     (void)__CFRunLoopPushPerRunData(loop);
-    
+
     // 初始化互斥锁
     __CFRunLoopLockInit(&loop->_lock);
-    
+
     // 分配唤醒端口
     loop->_wakeUpPort = __CFPortAllocate();
     if (CFPORT_NULL == loop->_wakeUpPort) HALT;  // 分配失败则终止
-    
+
     // 设置忽略唤醒标志
     __CFRunLoopSetIgnoreWakeUps(loop);
-    
+
     // 创建通用模式集合并添加默认模式
     loop->_commonModes = CFSetCreateMutable(
         kCFAllocatorSystemDefault,    // 默认分配器
@@ -1001,7 +984,7 @@ static CFRunLoopRef __CFRunLoopCreate(pthread_t t) {
         &kCFTypeSetCallBacks         // 标准 CF 类型回调
     );
     CFSetAddValue(loop->_commonModes, kCFRunLoopDefaultMode);
-    
+
     // 初始化其他字段
     loop->_commonModeItems = NULL;    // 通用模式项目
     loop->_currentMode = NULL;        // 当前模式
@@ -1010,27 +993,27 @@ static CFRunLoopRef __CFRunLoopCreate(pthread_t t) {
         0, 
         &kCFTypeSetCallBacks
     );
-    
+
     // 初始化 block 链表
     loop->_blocks_head = NULL;
     loop->_blocks_tail = NULL;
-    
+
     loop->_counterpart = NULL;        // 相关联对象
-    
+
     // 设置线程信息
     loop->_pthread = t;               // 关联的 pthread
-    
+
 #if DEPLOYMENT_TARGET_WINDOWS
     // Windows 平台特定：获取当前线程 ID
     loop->_winthread = GetCurrentThreadId();
 #else
     loop->_winthread = 0;
 #endif
-    
+
     // 创建并初始化默认运行模式
     rlm = __CFRunLoopFindMode(loop, kCFRunLoopDefaultMode, true);
     if (NULL != rlm) __CFRunLoopModeUnlock(rlm);  // 解锁模式
-    
+
     return loop;
 }
 ```
@@ -1043,14 +1026,14 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
     if (pthread_equal(t, kNilPthreadT)) {
         t = pthread_main_thread_np();
     }
-    
+
     // 加锁访问全局 RunLoop 字典
     __CFLock(&loopsLock);
-    
+
     // 首次调用时初始化全局 RunLoop 字典
     if (!__CFRunLoops) {
         __CFUnlock(&loopsLock);  // 临时解锁以避免死锁
-        
+
         // 创建存储所有 RunLoop 的字典
         CFMutableDictionaryRef dict = CFDictionaryCreateMutable(
             kCFAllocatorSystemDefault, 
@@ -1058,11 +1041,11 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
             NULL, 
             &kCFTypeDictionaryValueCallBacks
         );
-        
+
         // 创建主线程的 RunLoop
         CFRunLoopRef mainLoop = __CFRunLoopCreate(pthread_main_thread_np());
         CFDictionarySetValue(dict, pthreadPointer(pthread_main_thread_np()), mainLoop);
-        
+
         // 原子操作设置全局字典
         if (!OSAtomicCompareAndSwapPtrBarrier(NULL, dict, (void * volatile *)&__CFRunLoops)) {
             CFRelease(dict);  // 如果设置失败，释放资源
@@ -1070,16 +1053,16 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
         CFRelease(mainLoop);
         __CFLock(&loopsLock);
     }
-    
+
     // 查找指定线程的 RunLoop
     CFRunLoopRef loop = (CFRunLoopRef)CFDictionaryGetValue(__CFRunLoops, pthreadPointer(t));
     __CFUnlock(&loopsLock);
-    
+
     // 如果没找到，创建新的 RunLoop
     if (!loop) {
         CFRunLoopRef newLoop = __CFRunLoopCreate(t);
         __CFLock(&loopsLock);
-        
+
         // 双重检查，确保没有其他线程已经创建
         loop = (CFRunLoopRef)CFDictionaryGetValue(__CFRunLoops, pthreadPointer(t));
         if (!loop) {
@@ -1089,12 +1072,12 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
         __CFUnlock(&loopsLock);
         CFRelease(newLoop);
     }
-    
+
     // 如果是当前线程，设置线程特定数据
     if (pthread_equal(t, pthread_self())) {
         // 存储 RunLoop 到线程本地存储
         _CFSetTSD(__CFTSDKeyRunLoop, (void *)loop, NULL);
-        
+
         // 设置 RunLoop 计数器和清理函数
         if (0 == _CFGetTSD(__CFTSDKeyRunLoopCntr)) {
             _CFSetTSD(__CFTSDKeyRunLoopCntr, 
@@ -1102,7 +1085,7 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
                      (void (*)(void *))__CFFinalizeRunLoop);
         }
     }
-    
+
     return loop;
 }
 ```
@@ -1115,30 +1098,30 @@ static Boolean __CFRunLoopDoBlocks(CFRunLoopRef rl, CFRunLoopModeRef rlm) {
     // 快速检查：如果没有 blocks 或模式无效则返回
     if (!rl->_blocks_head) return false;
     if (!rlm || !rlm->_name) return false;
-    
+
     Boolean did = false;  // 标记是否执行了任何 block
-    
+
     // 保存当前 blocks 链表状态并清空
     struct _block_item *head = rl->_blocks_head;
     struct _block_item *tail = rl->_blocks_tail;
     rl->_blocks_head = NULL;
     rl->_blocks_tail = NULL;
-    
+
     // 保存当前上下文信息
     CFSetRef commonModes = rl->_commonModes;
     CFStringRef curMode = rlm->_name;
-    
+
     // 解锁以执行 blocks（避免死锁）
     __CFRunLoopModeUnlock(rlm);
     __CFRunLoopUnlock(rl);
-    
+
     // 遍历所有 blocks
     struct _block_item *prev = NULL;
     struct _block_item *item = head;
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-        
+
         // 判断是否应该执行此 block
         Boolean doit = false;
         if (CFStringGetTypeID() == CFGetTypeID(curr->_mode)) {
@@ -1152,44 +1135,44 @@ static Boolean __CFRunLoopDoBlocks(CFRunLoopRef rl, CFRunLoopModeRef rlm) {
                   (CFSetContainsValue((CFSetRef)curr->_mode, kCFRunLoopCommonModes) && 
                    CFSetContainsValue(commonModes, curMode));
         }
-        
+
         // 不执行则保留在链表中
         if (!doit) prev = curr;
-        
+
         // 执行 block
         if (doit) {
             // 更新链表
             if (prev) prev->_next = item;
             if (curr == head) head = item;
             if (curr == tail) tail = prev;
-            
+
             // 获取 block 并释放结构
             void (^block)(void) = curr->_block;
             CFRelease(curr->_mode);
             free(curr);
-            
+
             // 执行 block
             if (doit) {
                 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(block);
                 did = true;
             }
-            
+
             // 释放 block（在重新加锁之前完成，避免死锁）
             Block_release(block);
         }
     }
-    
+
     // 重新加锁
     __CFRunLoopLock(rl);
     __CFRunLoopModeLock(rlm);
-    
+
     // 如果还有未执行的 blocks，将它们重新加入队列
     if (head) {
         tail->_next = rl->_blocks_head;
         rl->_blocks_head = head;
         if (!rl->_blocks_tail) rl->_blocks_tail = tail;
     }
-    
+
     return did;  // 返回是否执行了任何 block
 }
 ```
@@ -1197,10 +1180,6 @@ static Boolean __CFRunLoopDoBlocks(CFRunLoopRef rl, CFRunLoopModeRef rlm) {
 12.24 更新至1664行
 
 未完待续......
-
-
-
-
 
 # 思考 & 答案
 

@@ -1,8 +1,8 @@
 ---
 title: Runloop机制介绍
 date: 2024-12-23 15:01:39
-tags: iOS
-
+categories:
+ - iOS
 ---
 
 # Runloop 机制

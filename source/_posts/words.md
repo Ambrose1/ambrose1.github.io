@@ -1,7 +1,8 @@
 ---
 title: words
 date: 2024-12-22 23:04:11
-
+categories:
+ - 英语
 ---
 
 # 背单词计划

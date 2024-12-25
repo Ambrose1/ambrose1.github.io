@@ -2,7 +2,8 @@
 title: xcode适配
 date: 2024-12-23 10:40:19
 donate: true
-
+categories:
+ - iOS
 ---
 
 # Xcode 16
