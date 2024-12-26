@@ -161,7 +161,6 @@ GCD是一套基于C语言的封装，对外暴露了简单的API，开发者只�
    
        }
    }
-   
    ```
 
 **OC 版本**
@@ -169,19 +168,19 @@ GCD是一套基于C语言的封装，对外暴露了简单的API，开发者只�
 ```objc
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // 创建一个高优先级的全局队列
     dispatch_queue_t highPriorityQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
-    
+
     // 模拟同时执行三个任务
     dispatch_async(highPriorityQueue, ^{
         [self doTask1];
     });
-    
+
     dispatch_async(highPriorityQueue, ^{
         [self doTask2];
     });
-    
+
     dispatch_async(highPriorityQueue, ^{
         [self doTask3];
     });
@@ -284,8 +283,6 @@ dispatch_async(concurrentQue, ^{
 dispatch_barrier_async(concurrentQue, ^{
     [self updateCache];
 });
-
-
 ```
 
 ```swift
@@ -347,12 +344,246 @@ for _ in 0..<10 {
 
 在 Objective - C 示例中，首先使用 `dispatch_semaphore_create` 创建一个信号量，初始值为 3，表示最多允许 3 个线程同时访问资源。然后在一个循环中，通过 `dispatch_async` 将任务添加到全局队列中异步执行。每个任务在访问数据库连接前，使用 `dispatch_semaphore_wait` 等待信号量计数大于 0，获取到信号量后（计数减 1），就可以获取和使用数据库连接。使用完后，通过 `dispatch_semaphore_signal` 释放信号量（计数加 1），以便其他线程可以获取。Swift 示例的原理和操作方式类似。
 
+**dispatch_source**
+
+这是一个功能强大的API，用于处理基于事件的异步任务。它可以处理如定时器、信号处理、文件描述符相关事件（如读取、写入等）等多种类型的事件。`dispatch_source` 能够在事件发生时自动将任务添加到指定的队列中执行，从而实现高效的事件驱动编程。
+
+**使用场景和示例 - 定时器应用**：
+
+- 假设要实现一个简单的定时器，每隔一段时间执行一个任务。
+  
+  ```objc
+  // Objective - C示例
+  dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+  dispatch_time_t start = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+  uint64_t interval = (uint64_t)(1.0 * NSEC_PER_SEC);
+  dispatch_source_set_timer(timer, start, interval, 0);
+  dispatch_source_set_event_handler(timer, ^{
+  // 在这里执行定时任务，比如更新UI上的时间显示
+  NSDate *currentDate = [NSDate date];
+  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+  [formatter setDateFormat:@"HH:mm:ss"];
+  NSString *dateString = [formatter stringFromDate:currentDate];
+  self.timerLabel.text = dateString;
+  });
+  dispatch_resume(timer);
+  ```
+  
+  ```swift
+  // Swift示例
+  let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+  let start = DispatchTime.now() + 1.0
+  let interval: DispatchTimeInterval =.seconds(1)
+  timer.schedule(deadline: start, repeating: interval)
+  timer.setEventHandler {
+  // 在这里执行定时任务，比如更新UI上的时间显示
+  let currentDate = Date()
+  let formatter = DateFormatter()
+  formatter.dateFormat = "HH:mm:ss"
+  let dateString = formatter.string(from: currentDate)
+  self.timerLabel.text = dateString
+  }
+  timer.resume()
+  ```
+  
+  在Objective - C示例中，首先使用 `dispatch_source_create` 创建一个定时器类型（`DISPATCH_SOURCE_TYPE_TIMER`）的 `dispatch_source` 对象，并将其与主队列（`dispatch_get_main_queue`）关联，这样定时器事件触发后的任务会在主线程执行。接着设置定时器的启动时间（`dispatch_time`）和间隔时间（`interval`），通过 `dispatch_source_set_timer` 来配置定时器。然后使用 `dispatch_source_set_event_handler` 定义定时器事件触发时要执行的任务，这里是更新一个UI标签来显示当前时间。最后通过 `dispatch_resume` 启动定时器。Swift示例的操作过程类似，不过在一些函数和类型的使用上更符合Swift的语法习惯。
+- **使用场景和示例 - 文件读取应用**：
+- 当读取一个文件时，可以使用 `dispatch_source` 来监控文件读取事件，以便在数据可用时进行处理。
+  
+  ```objc
+  // Objective - C示例
+  int fileDescriptor = open("example.txt", O_RDONLY);
+  dispatch_source_t readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fileDescriptor, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+  dispatch_source_set_event_handler(readSource, ^{
+  char buffer[1024];
+  ssize_t bytesRead = read(fileDescriptor, buffer, sizeof(buffer));
+  if (bytesRead > 0) {
+  // 处理读取到的数据
+  NSString *dataString = [[NSString alloc] initWithBytes:buffer length:bytesRead encoding:NSUTF8StringEncoding];
+  NSLog(@"读取到的数据: %@", dataString);
+  } else if (bytesRead == 0) {
+  // 文件读取完毕
+  dispatch_source_cancel(readSource);
+  close(fileDescriptor);
+  }
+  });
+  dispatch_resume(readSource);
+  ```
+  
+  ```swift
+  // Swift示例
+  let fileURL = URL(fileURLWithPath: "example.txt")
+  let fileDescriptor = open(fileURL.path, O_RDONLY)
+  let readSource = DispatchSource.makeReadSource(fileDescriptor: fileDescriptor, queue: DispatchQueue.global())
+  readSource.setEventHandler {
+  let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: 1024)
+  let bytesRead = read(fileDescriptor, buffer, 1024)
+  if bytesRead > 0 {
+  // 处理读取到的数据
+  let dataString = String(cString: buffer, encoding:.utf8)
+  print("读取到的数据: \(dataString!)")
+  } else if bytesRead == 0 {
+  // 文件读取完毕
+  readSource.cancel()
+  close(fileDescriptor)
+  }
+  buffer.deallocate()
+  }
+  readSource.resume()
+  ```
+  
+  
+
+**dispatch_apply**
+
+这个函数用于在指定的队列上以并行或串行的方式多次执行一个任务。它类似于一个循环，但可以利用队列的并行性来提高执行效率，特别是对于可以并行处理的任务。
+
+- 假设要对一个数组中的元素进行某种操作，并且这些操作可以并行进行，比如对数组中的每个元素进行平方运算。
+  
+  ```objc
+  // Objective - C示例
+  NSArray *numbers = @[@1, @2, @3, @4, @5];
+  dispatch_queue_t concurrentQueue = dispatch_queue_create("com.example.concurrentQueue", DISPATCH_QUEUE_CONCURRENT);
+  dispatch_apply(numbers.count, concurrentQueue, ^(size_t index) {
+  NSNumber *number = numbers[index];
+  NSNumber *squaredNumber = @([number integerValue] * [number integerValue]);
+  NSLog(@"元素 %@ 的平方是 %@", number, squaredNumber);
+  });
+  ```
+  
+  ```swift
+  // Swift示例
+  let numbers = [1, 2, 3, 4, 5]
+  let concurrentQueue = DispatchQueue(label: "com.example.concurrentQueue", attributes:.concurrent)
+  dispatch_apply(numbers.count, concurrentQueue) { index in
+  let number = numbers[index]
+  let squaredNumber = number * number
+  print("元素 \(number) 的平方是 \(squaredNumber)")
+  }
+  ```
+  
+  
+
+**dispatch_set_target_queue**
+
+用于设置一个队列的目标队列。这在管理队列的优先级和继承关系等方面非常有用。例如，可以将一个自定义队列的目标队列设置为全局队列，这样自定义队列中的任务会根据目标队列的优先级和属性来执行。
+
+- 假设有一个自定义的串行队列，希望它继承全局队列的优先级和一些属性，就可以使用这个API。
+  
+  ```objc
+  // Objective - C示例
+  dispatch_queue_t customSerialQueue = dispatch_queue_create("com.example.customSerialQueue", DISPATCH_QUEUE_SERIAL);
+  dispatch_queue_t targetGlobalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+  dispatch_set_target_queue(customSerialQueue, targetGlobalQueue);
+  dispatch_async(customSerialQueue, ^{
+  // 执行任务，会根据目标全局队列的优先级等属性来执行
+  NSLog(@"任务在自定义串行队列中执行，其目标是全局队列");
+  });
+  ```
+  
+  ```swift
+  // Swift示例
+  let customSerialQueue = DispatchQueue(label: "com.example.customSerialQueue", attributes:.serial)
+  let targetGlobalQueue = DispatchQueue.global()
+  customSerialQueue.setTarget(queue: targetGlobalQueue)
+  customSerialQueue.async {
+  // 执行任务，会根据目标全局队列的优先级等属性来执行
+  print("任务在自定义串行队列中执行，其目标是全局队列")
+  }
+  ```
+- 在Objective - C示例中，首先创建了一个自定义的串行队列 `customSerialQueue` 和一个目标全局队列 `targetGlobalQueue`，然后使用 `dispatch_set_target_queue` 将自定义队列的目标队列设置为全局队列。之后通过 `dispatch_async` 将任务添加到自定义队列中，这个任务会根据目标全局队列的优先级等属性来执行。Swift示例的操作类似，只是在设置目标队列的语法上略有不同（`setTarget(queue:)`）。
+
+### NSOperation
+
+NSOperation 是一个抽象类。自定义子类继承NSOperation 实现具体的任务细节以及执行、暂停、取消等能力。
+
+NSOperation对象将每一类任务封装成一个对象，使其可以独立执行和管理，同时可以独立的管理执行、暂停、取消事件。
+
+可以看到在GCD中并没有提供这种程度的封装和对于执行过程的控制能力。NSOperation更细粒度的管理任务的执行。
+
+**关键属性和方法**
+
+**main**
+
+通常需要重写main方法定义任务的具体逻辑。Operation被执行时，main方法会在一个合适的线程中运行。
+
+eg. code
+
+```swift
+class DataProcessingOperation: NSOperation {
+    override func main() {
+        guard !self.isCancelled else {
+            return
+        }
+        var sum = 0
+        for i in 1...100 {
+            sum += i
+        }
+        print("result of data process: \(sum)")
+
+    }
+}
+```
+
+**start**
+
+这个方法用于启动一个Operation。 在生产环境中，通常将Operation添加到队列中，将执行操作交给队列进行管理。
 
 
-**`dispatch_source`**
 
-**`dispatch_apply`**
+**NSOperationQueue 与任务调度**
 
-**`dispatch_set_target_queue`**
+NSOperationQueue 用于管理NSOperation实例。队列的属性`maxConcurrentOperationCount` 用于设置队列中同时可以执行的操作的数量。设置为1时相当于串行队列，否则并发队列。默认值为-1。
 
-未完待续...
+eg. 
+
+```swift
+let operation1 = DataProcessingOperation()
+let operation2 = FileDownloadOperation()
+let operationQueue = NSOperationQueue()
+operationQueue.addOperation(operation1)
+operationQueue.addOperation(operation2)
+```
+
+waitUntilFinished 属性，设置为true，阻塞线程，直到队列内任务执行完毕。
+
+```swift
+let operationArray: [NSOperation] = [operation1, operation2]
+operationQueue.addOperations(operationArray, waitUntilFinished: false)
+```
+
+**Operation之间的依赖和优先级**
+
+**依赖关系**
+
+Operation 通过addDependency 方法为操作增加依赖关系 。 
+
+eg, A 依赖 B， A会在B执行完之后开始执行。
+
+```swift
+let downloadOperation = FileDownloadOperation()
+let filterOperation = ImageFilterOperation()
+filterOperation.addDependency(downloadOperation)
+let operationQueue = NSOperationQueue()
+operationQueue.addOperation(downloadOperation)
+operationQueue.addOperation(filterOperation)
+```
+
+**优先级设置**
+
+设置Operation的优先级只能影响Operation的执行顺序，但是还是会收到依赖、系统资源的影响。
+
+```swift
+let highPriorityOperation = DataProcessingOperation()
+highPriorityOperation.queuePriority =.veryHigh
+let normalPriorityOperation = FileDownloadOperation()
+let operationQueue = NSOperationQueue()
+operationQueue.addOperation(highPriorityOperation)
+operationQueue.addOperation(normalPriorityOperation)
+```
+
+
+
+
+
+暂时先写到这里... 复习时可能会补充。
