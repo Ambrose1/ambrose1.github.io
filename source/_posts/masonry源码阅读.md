@@ -5,7 +5,7 @@ categories:
  - iOS
 tags:
  - Masonry
-abstract: 简介
+abstract: Masonry是一个iOS 自动布局库，阅读并记录一下源码的实现方案。
 ---
 
 # Masonry 源码阅读笔记

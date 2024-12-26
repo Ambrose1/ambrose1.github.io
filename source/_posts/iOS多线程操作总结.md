@@ -8,6 +8,7 @@ tags:
  - swift
 categories: 
 - iOS
+donate: true
 ---
 
 # 序
@@ -387,7 +388,9 @@ for _ in 0..<10 {
   ```
   
   在Objective - C示例中，首先使用 `dispatch_source_create` 创建一个定时器类型（`DISPATCH_SOURCE_TYPE_TIMER`）的 `dispatch_source` 对象，并将其与主队列（`dispatch_get_main_queue`）关联，这样定时器事件触发后的任务会在主线程执行。接着设置定时器的启动时间（`dispatch_time`）和间隔时间（`interval`），通过 `dispatch_source_set_timer` 来配置定时器。然后使用 `dispatch_source_set_event_handler` 定义定时器事件触发时要执行的任务，这里是更新一个UI标签来显示当前时间。最后通过 `dispatch_resume` 启动定时器。Swift示例的操作过程类似，不过在一些函数和类型的使用上更符合Swift的语法习惯。
+
 - **使用场景和示例 - 文件读取应用**：
+
 - 当读取一个文件时，可以使用 `dispatch_source` 来监控文件读取事件，以便在数据可用时进行处理。
   
   ```objc
@@ -431,8 +434,6 @@ for _ in 0..<10 {
   }
   readSource.resume()
   ```
-  
-  
 
 **dispatch_apply**
 
@@ -461,8 +462,6 @@ for _ in 0..<10 {
   print("元素 \(number) 的平方是 \(squaredNumber)")
   }
   ```
-  
-  
 
 **dispatch_set_target_queue**
 
@@ -491,6 +490,7 @@ for _ in 0..<10 {
   print("任务在自定义串行队列中执行，其目标是全局队列")
   }
   ```
+
 - 在Objective - C示例中，首先创建了一个自定义的串行队列 `customSerialQueue` 和一个目标全局队列 `targetGlobalQueue`，然后使用 `dispatch_set_target_queue` 将自定义队列的目标队列设置为全局队列。之后通过 `dispatch_async` 将任务添加到自定义队列中，这个任务会根据目标全局队列的优先级等属性来执行。Swift示例的操作类似，只是在设置目标队列的语法上略有不同（`setTarget(queue:)`）。
 
 ### NSOperation
@@ -528,8 +528,6 @@ class DataProcessingOperation: NSOperation {
 **start**
 
 这个方法用于启动一个Operation。 在生产环境中，通常将Operation添加到队列中，将执行操作交给队列进行管理。
-
-
 
 **NSOperationQueue 与任务调度**
 
@@ -581,9 +579,5 @@ let operationQueue = NSOperationQueue()
 operationQueue.addOperation(highPriorityOperation)
 operationQueue.addOperation(normalPriorityOperation)
 ```
-
-
-
-
 
 暂时先写到这里... 复习时可能会补充。
