@@ -1,9 +1,11 @@
 ---
 title: Swift Runtime的核心能力与实践
-abstract: 补充简介
+abstract: 介绍swift的runtime使用方式、以及与OC的Runtime的关系。
 date: 2025-02-13 16:20:38
-tags:
+tags: swift
 categories:
+- swift
+- runtime
 ---
 
 # 一. 概述
@@ -11,8 +13,6 @@ categories:
 对比OC（Objective-C）Swift 在设计上更强调安全性和性能，因此在动态特性上做了一些限制。同时为了兼容OC、支持自身的一些高级功能，保留了部分Runtime能力。
 
 当Swift类继承自NSObject、或者使用@objc修饰时，这些类和成员会暴露给OC的runtime, 从而获取动态派发的能力。
-
-
 
 # 二 . Runtime
 
@@ -76,8 +76,6 @@ for child in mirror.children {
 
 应用场景： 调试日志、JSON序列化工具。
 
-
-
 ### 2.2.4 协议扩展与动态类型检查
 
 1. 协议扩展， 在运行时根据类型动态分发方法实现。
@@ -117,10 +115,6 @@ Swift 的ARC :
 
 3. 弱引用优化 weak和unowned编译时检查。
 
-
-
-
-
 # 关于动态派发和静态派发边界的选择原因
 
 Swift 中静态派发与动态派发的划分基于类型安全、继承机制和可见性控制，旨在平衡性能与灵活性。以下是具体原因：
@@ -156,6 +150,7 @@ Swift 中静态派发与动态派发的划分基于类型安全、继承机制�
 #### 2. **普通类方法（非 `final`）**
 
 - **类继承与重写**：类方法（`class func`）可能被派生类重写，需动态派发。
+
 - **示例**：
   
   ```swift
