@@ -130,8 +130,4 @@ The frame rectangle, which describes the view’s location and size in its super
 
 The bounds rectangle, which describes the view’s location and size in its own coordinate system.
 
-
-
-
-
 持续更新ing...
