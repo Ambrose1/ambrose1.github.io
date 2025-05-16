@@ -58,3 +58,7 @@ categories:
 10. **The surreptitious glances between the two lovers did not escape the teacher's notice.（这对恋人偷偷摸摸的眼神没有逃过老师的注意。）**
     
     - **surreptitious** [ˌsʌrəpˈtɪʃəs]：adj. 鬼鬼祟祟的；偷偷摸摸的；秘密的
+
+## 2025 01 11
+
+kik-start your reinvention
